@@ -1,0 +1,25 @@
+{
+  "name": "loteria---redes-computacional",
+  "version": "1.0.0",
+  "description": "Aplicação que simula uma loteria para redes computacionais, permitindo testar e analisar algoritmos de seleção aleatória e distribuição de recursos em ambientes de rede. Ideal para estudos em sistemas distribuídos e protocolos de comunicação.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RenatoHPissinatti/Loteria---Redes-Computacional.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RenatoHPissinatti/Loteria---Redes-Computacional/issues"
+  },
+  "homepage": "https://github.com/RenatoHPissinatti/Loteria---Redes-Computacional#readme",
+  "dependencies": {
+    "express": "^5.1.0",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1"
+  }
+}
