@@ -1,15 +1,12 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Loteria Socket.IO</title>
-</head>
-<body>
-    <h1>Loteria</h1>
-    <p id="status"></p>
+<script type="module">
+    import { io } from "https://cdn.socket.io/4.7.5/socket.io.esm.min.js";
 
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="client.js"></script>
-</body>
-</html>
+    const socket = io("http://localhost:3000", {
+        transports: ["websocket"], //força o websocket
+        auth: { token: localStorage.getItem('token')} //auth opcional
+    });
+
+    socket.on('connect', () => console.log('conectado', socket.id));
+    socket.on('welcome', (p) => console.log(p));
+    socket.emit('chat:message', 'oi', (ack) => console.log('ack', ack));
+</script>

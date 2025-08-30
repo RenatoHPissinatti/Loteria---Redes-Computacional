@@ -1,38 +1,32 @@
-const express = require('express');
-const http = require('http');
-const { Server } = require('socket.io');
-const path = require('path');
+import http from 'http';
+import { Server } from 'socket.io';
 
-const app = express();
-const server = http.createServer(app);
-const io = new Server(server);
+const httpServer = http.createServer();
 
-// Define a porta do servidor
-const PORT = process.env.PORT || 3000;
-
-// Serve os arquivos estáticos da pasta 'public'
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Rota principal para o index.html
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+const io = new Server(httpServer, {
+  cors: {origin: 'http/localhost:8080'}
 });
 
-// Evento de conexão
-io.on('connection', (socket) => {
-  console.log('Um cliente conectado!');
+io.on('coneection', (socket) => {
+  console.log('cliente conectado', socket.id);
 
-  // Envia a mensagem de boas-vindas ao cliente
-  const timestamp = new Date().toLocaleTimeString();
-  socket.emit('msg1', `${timestamp}: CONECTADO!!`);
+  //Enviar evento só para um cliente específico
+  socket.emit('Welcome', {msg: 'Bem-vindo!'});
 
-  // Lidar com desconexões
-  socket.on('disconnect', () => {
-    console.log('Cliente desconectado.');
+  //Receber evento do cliente
+  socket.on('chat:message', payLoad, ackFn => {
+    console.log('mensagem', payLoad);
+    //Envia para todos, menos para o remetente
+    socket.broadcast.emit('chat:massage', {from: socket.id, text: payLoad});
+    //ack (se cliente forneceu callback)
+    if (typeof ackFn === 'function') ackFn({ok: true});
   });
+
+  //entrada e saída de rooms
+  socket.on('join', (room) => socket.join(room));
+  socket.on('leave', (room) => socket.leave(room));
+
+  socket.on('disconnect', (reason) => console.log('disconectado', reason));
 });
 
-// Inicia o servidor
-server.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
-});
+httpServer.listen(3000);
