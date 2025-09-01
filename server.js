@@ -60,7 +60,7 @@ function realizarSorteio() {
   console.log('Números sorteados:', resultado);
 }
 
-// Inicia o timer
+// Inicia o timer do sorteio
 setInterval(realizarSorteio, 60000);
 
 // Inicia o servidor
