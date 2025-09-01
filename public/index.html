@@ -6,62 +6,8 @@
     <title>Loteria Socket.IO</title>
 </head>
 <body>
-    <div>
-        <header>
-            <div>
-                <h1>LottoNet</h1>
-                <p id="status"></p>
-            </div>
-        </header>
-
-        <main>
-            <section>
-                <h2>Conexão com o servidor</h2>
-                <div>
-                    <label for="server-adress"> Endereço do servidor: </label>
-                    <input type="text">
-                    <button>Conectar</button>
-                </div>
-            </section>
-
-            <section>
-                <h2>Parâmetros da Aposta</h2>
-                <div>
-                    <label for="begin">Número inicial</label>
-                    <input type="number" id="begin_num">
-                </div>
-                <div>
-                    <label for="end">Número final</label>
-                    <input type="number" id="end_num">
-                </div>
-                <div>
-                    <label for="qtd">Quantidade de números: </label>
-                    <input type="number" id="qtd_num">
-                </div>
-            </section>
-
-            <section>
-                <h2>Números da Aposta</h2>
-                <div>
-                    <label for="y_nums">Digite seus números da sorte!</label>
-                    <input type="text" id="y_nums" placeholder="Ex: 5 14 23 41 59 61">
-                </div>
-                <button id="gen-btn">Gerar Aposta</button>
-                <div id="result-nums"></div>
-            </section>
-
-            <section>
-                <button id="send-ans">Enviar Aposta</button>
-                <button id="clean">Limpar</button>
-            </section>
-
-            <section>
-                <h2>Resultados e Histórico</h2>
-                <div id="hist"></div>
-            </section>
-        </main>
-    </div>
-
+    <h1>Loteria</h1>
+    <p id="status"></p>
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="client.js"></script>
