@@ -44,6 +44,9 @@ socket.on('enviar_comando', (mensagem) => {
       const numeros = mensagem.split(' ').map(n => n.trim()).map(Number);
       apostasClientes.set(socket.id, numeros);
     
+      if (numerosApostados.some(isNaN)) {
+      socket.emit('erro', 'Aposta inválida. Por favor, envie apenas números separados por espaço.');
+      return;}
       if (numerosApostados.length !== configLoteria.qtd){
         socket.emit('erro',`Aposta inválida. Você deve apostar exatamente ${configLoteria.qtd} números!`)
         return;
