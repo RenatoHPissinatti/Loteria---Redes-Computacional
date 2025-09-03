@@ -29,14 +29,30 @@ io.on('connection', (socket) => {
 socket.on('enviar_comando', (mensagem) => {
     if (mensagem.startsWith(':')) {
       const [comando, valor] = mensagem.split(' ');
-      // Modifica a variável configLoteria que está lá fora
-      if (comando === ':inicio') configLoteria.inicio = parseInt(valor);
-      if (comando === ':fim') configLoteria.fim = parseInt(valor);
-      if (comando === ':qtd') configLoteria.qtd = parseInt(valor);
+      const valorNum = parseInt(valorStr);
+      if (isNaN(valorNum)){
+        socket.emit('erro', `Valor inválido para ${comando}. Lembre-se de usar somente números inteiros!`);
+        return;
+      }
+
+      if (comando === ':inicio') configLoteria.inicio = valorNum;
+      if (comando === ':fim') configLoteria.fim = valorNum;
+      if (comando === ':qtd') configLoteria.qtd = valorNum;
       console.log('Configuração da loteria atualizada:', configLoteria);
+      socket.emit('info','Configuração atualizada com sucesso!');
     } else {
-      const numeros = mensagem.split(' ').map(n => parseInt(n));
+      const numeros = mensagem.split(' ').map(n => n.trim()).map(Number);
       apostasClientes.set(socket.id, numeros);
+    
+      if (numerosApostados.length !== configLoteria.qtd){
+        socket.emit('erro',`Aposta inválida. Você deve apostar exatamente ${configLoteria.qtd} números!`)
+        return;
+      }
+    
+    apostasClientes.set(SocketAddress.id, numerosApostados);
+    console.log(`Aposta de ${socket.id} recebida!`, numerosApostados);
+    socket.emit('info', 'Sua aposta foi recebida! Aguardando o sorteio e boa sorte!');
+    
     }
   });
   // Lidar com desconexões
