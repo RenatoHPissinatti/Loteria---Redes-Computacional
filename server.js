@@ -20,7 +20,7 @@ app.get('/', (req, res) => {
 
 // Variáveis de estado globais
 const apostasClientes = new Map();
-const configLoteria = { inicio: 0, fim: 100, qtd: 5 };
+const configLoteria = { inicio: 0, fim: 5, qtd: 5 };
 
 // Função para realizar o sorteio (Thread 2 do Servidor)
 function realizarSorteio() {
@@ -42,7 +42,7 @@ function realizarSorteio() {
    const acertos = apostas.filter(aposta => numerosSorteados.has(aposta)); 
 
  // Envia o resultado para o cliente
-   io.to(socketId).emit('lottery_result', {
+   io.to(socketId).emit('resultado_loteria', {
     sorted: resultado,
     guesses: acertos
    });
@@ -55,7 +55,7 @@ function realizarSorteio() {
 }
 
 // Inicia o timer do sorteio
-setInterval(realizarSorteio, 60000);
+setInterval(realizarSorteio, 10000);
 
 // Evento de conexão
 io.on('connection', (socket) => {

@@ -17,3 +17,16 @@ function sendMessage() {
         inputElement.value = ''; // Limpa o campo de entrada
     }
 }
+
+// "Thread 2" do cliente: Recebe o resultado do sorteio e mostra a quantidade de acertos
+socket.on('resultado_loteria', (mensagemResultado) => {
+    const messagesDiv = document.getElementById('messages');
+    const p = document.createElement('p');
+
+    //acessamos as propriedades do objeto 'mensagemResultado'
+    const sortedNumbers = mensagemResultado.sorted;
+    const correctGuesses = mensagemResultado.guesses;
+
+    p.innerText = `Números sorteados: [${sortedNumbers.join(', ')}]. Você acertou: [${correctGuesses.join(', ')}].`;
+    messagesDiv.appendChild(p);
+});
