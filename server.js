@@ -29,7 +29,7 @@ io.on('connection', (socket) => {
 socket.on('enviar_comando', (mensagem) => {
     if (mensagem.startsWith(':')) {
       const [comando, valor] = mensagem.split(' ');
-      const valorNum = parseInt(valorStr);
+      const valorNum = parseInt(valor, 10);
       if (isNaN(valorNum)){
         socket.emit('erro', `Valor inválido para ${comando}. Lembre-se de usar somente números inteiros!`);
         return;
@@ -42,17 +42,18 @@ socket.on('enviar_comando', (mensagem) => {
       socket.emit('info','Configuração atualizada com sucesso!');
     } else {
       const numeros = mensagem.split(' ').map(n => n.trim()).map(Number);
-      apostasClientes.set(socket.id, numeros);
+      
     
       if (numerosApostados.some(isNaN)) {
       socket.emit('erro', 'Aposta inválida. Por favor, envie apenas números separados por espaço.');
       return;}
       if (numerosApostados.length !== configLoteria.qtd){
         socket.emit('erro',`Aposta inválida. Você deve apostar exatamente ${configLoteria.qtd} números!`)
+        
         return;
       }
     
-    apostasClientes.set(SocketAddress.id, numerosApostados);
+    apostasClientes.set(socket.id, numeros);
     console.log(`Aposta de ${socket.id} recebida!`, numerosApostados);
     socket.emit('info', 'Sua aposta foi recebida! Aguardando o sorteio e boa sorte!');
     
