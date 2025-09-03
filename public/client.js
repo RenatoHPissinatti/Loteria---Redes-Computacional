@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
                    `Acertos: ${correctNumbers.length} (${correctNumbers.join(', ')})`);
     });
 
-    function sendMessage() {
+    function enviarAposta() {
         const message = messageInput.value.trim();
         if (message) {
             socket.emit('client_message', message);
@@ -44,10 +44,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         messageInput.focus();
     }
-
-    sendBtn.addEventListener('click', sendMessage);
     messageInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') sendMessage();
+        if (e.key === 'Enter') enviarAposta();
     });
 
     messageInput.focus();
