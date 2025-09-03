@@ -59,7 +59,7 @@ setInterval(realizarSorteio, 60000);
 
 // Evento de conexão
 io.on('connection', (socket) => {
- console.log('Um cliente conectado!');
+ console.log(`Um cliente conectado! ${socket.id}`);
 
  // Inicializa a lista de apostas para o novo cliente no Map
  apostasClientes.set(socket.id, []);
@@ -72,12 +72,10 @@ io.on('connection', (socket) => {
  socket.on('client_message', (message) => {
   console.log(`Mensagem recebida do cliente ${socket.id}: ${message}`);
  
-  // Lógica para interpretar comandos ou apostas
-  if (message.startsWith(':')) {
+  if (message.startsWith(':')) {       // Lógica para interpretar comandos ou apostas
    const parts = message.split(' ');
    const command = parts[0];
    const value = parseInt(parts[1]);
-
    switch (command) {
     case ':inicio':
      if (!isNaN(value)) {

@@ -34,7 +34,7 @@
             </section>                
 -->                
 
-            <section>
+<!--           <section>
                 <h2>Números da Aposta</h2>
                 <div>
                     <label for="y_nums">Digite seus números da sorte!</label>
@@ -45,20 +45,16 @@
             </section>
         </main>
     </div>
+-->
 </body>
-  <script src="/socket.io/socket.io.js"></script>
-  <script>
-    const socket = new io();
+    <h1>Loteria</h1>
+    <p id="status"></p>
+    <div id="messages"></div>
 
-    const form = document.getElementById('text');
-    const input = document.getElementById('input');
+    <input type="text" id="inputMessage" placeholder="Digite seus comandos ou apostas...">
+    <button onclick="sendMessage()">Enviar</button>
 
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      if (input.value) {
-        socket.emit('chat message', input.value);
-        input.value = '';
-      }
-    });
-  </script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="client.js"></script>
+</body>
 </html>
