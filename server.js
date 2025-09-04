@@ -21,7 +21,10 @@ const apostasClientes = new Map();
 const configLoteria = {inicio: 0, fim: 100, qtd:5};
 // Evento de conexão
 io.on('connection', (socket) => {
-  console.log('Um cliente conectado!');
+ console.log('Um cliente conectado!');
+
+ // Inicializa a lista de apostas para o novo cliente no Map
+ apostasClientes.set(socket.id, []);
 
   // Envia a mensagem de boas-vindas ao cliente
   const timestamp = new Date().toLocaleTimeString();

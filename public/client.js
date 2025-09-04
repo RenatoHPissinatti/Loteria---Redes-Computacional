@@ -1,54 +1,19 @@
-/*
-Função que garente que o só seja executado
- após o carregamento completo da página 
- */
-document.addEventListener('DOMContentLoaded', () => {
-    const socket = io();
-    const messageInput = document.getElementById('messageInput');
-    const sendBtn = document.getElementById('sendBtn');
-    const log = document.getElementById('log');
+const socket = io();
 
-    function addMessage(message, type = 'system') {
-        const msgElement = document.createElement('div');
-        msgElement.className = type;
-        msgElement.textContent = message;
-        log.appendChild(msgElement);
-        log.scrollTop = log.scrollHeight;
-    }
-
-    socket.on('connect', () => {
-        addMessage('Conectado ao servidor');
-    });
-
-    socket.on('disconnect', () => {
-        addMessage('Desconectado do servidor');
-    });
-
-    socket.on('msg1', (data) => {
-        addMessage(`Servidor: ${data}`);
-    });
-
-    socket.on('lottery_result', (data) => {
-        const { sorted, guesses } = data;
-        const correctNumbers = guesses.filter(num => sorted.includes(num));
-        addMessage(`Números sorteados: [${sorted.join(', ')}] | ` +
-                   `Acertos: ${correctNumbers.length} (${correctNumbers.join(', ')})`);
-    });
-
-    function sendMessage() {
-        const message = messageInput.value.trim();
-        if (message) {
-            socket.emit('client_message', message);
-            addMessage(`Você: ${message}`, 'user-message');
-            messageInput.value = '';
-        }
-        messageInput.focus();
-    }
-
-    sendBtn.addEventListener('click', sendMessage);
-    messageInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') sendMessage();
-    });
-
-    messageInput.focus();
+// Manipula a mensagem 'msg1' enviada pelo servidor
+socket.on('msg1', (message) => {
+    const statusElement = document.getElementById('status');
+    statusElement.innerText = message;
+    console.log(message);
 });
+
+// "Thread 1" do cliente: Lida com a entrada do usuário
+function sendMessage() {
+    const inputElement = document.getElementById('inputMessage');
+    const message = inputElement.value;
+    if (message.trim() !== '') {
+        // Envia a mensagem para o servidor
+        socket.emit('client_message', message);
+        inputElement.value = ''; // Limpa o campo de entrada
+    }
+}
