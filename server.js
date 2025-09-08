@@ -15,43 +15,55 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Rota principal para o index.html
 app.get('/', (req, res) => {
- res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Variáveis de estado globais
 const apostasClientes = new Map();
-const configLoteria = { inicio: 0, fim: 5, qtd: 5 };
+const configLoteria = { inicio: 0, fim: 100, qtd: 5 };
 
 // Função para realizar o sorteio (Thread 2 do Servidor)
 function realizarSorteio() {
- console.log('--- REALIZANDO SORTEIO ---');
- console.log('Configuração atual:', configLoteria);
+  console.log('--- REALIZANDO SORTEIO ---');
+  console.log('Configuração atual:', configLoteria);
 
- const { inicio, fim, qtd } = configLoteria;
- const numerosSorteados = new Set();
- while (numerosSorteados.size < qtd) {
-  const numero = Math.floor(Math.random() * (fim - inicio + 1)) + inicio;
-  numerosSorteados.add(numero);
- }
- const resultado = Array.from(numerosSorteados);
- console.log('Números sorteados:', resultado);
-
- // Percorre todos os clientes que fizeram apostas
- for (const [socketId, apostas] of apostasClientes.entries()) {
-  if (apostas.length > 0) {
-   const acertos = apostas.filter(aposta => numerosSorteados.has(aposta)); 
-
- // Envia o resultado para o cliente
-   io.to(socketId).emit('resultado_loteria', {
-    sorted: resultado,
-    guesses: acertos
-   });
-  console.log(`Resultado enviado para ${socketId}: ${acertos.length} acertos.`);
+  const { inicio, fim, qtd } = configLoteria;
+  const numerosSorteados = new Set();
+  while (numerosSorteados.size < qtd) {
+    const numero = Math.floor(Math.random() * (fim - inicio + 1)) + inicio;
+    numerosSorteados.add(numero);
   }
- }
+  const resultado = Array.from(numerosSorteados);
+  console.log('Números sorteados:', resultado);
 
- // Zera a lista de apostas para o próximo ciclo
- apostasClientes.clear();
+  // Percorre todos os clientes conectados
+  for (const socketId of io.sockets.sockets.keys()) {
+    // Verifica se o cliente fez alguma aposta
+    const apostas = apostasClientes.get(socketId) || [];
+    let mensagemParaCliente;
+    
+    if (apostas.length > 0) {
+      const acertos = apostas.filter(aposta => numerosSorteados.has(aposta)); 
+      mensagemParaCliente = {
+        sorted: resultado,
+        guesses: acertos
+      };
+      console.log(`Resultado enviado para ${socketId}: ${acertos.length} acertos.`);
+    } else {
+      // Cliente não apostou, envia apenas o resultado do sorteio com lista de acertos vazia
+      mensagemParaCliente = {
+        sorted: resultado,
+        guesses: []
+      };
+      console.log(`Resultado do sorteio enviado para ${socketId}. O cliente não fez apostas.`);
+    }
+    
+    // Envia a mensagem para o cliente
+    io.to(socketId).emit('resultado_loteria', mensagemParaCliente);
+  }
+
+  // Zera a lista de apostas para o próximo ciclo
+  apostasClientes.clear();
 }
 
 // Inicia o timer do sorteio
@@ -59,50 +71,64 @@ setInterval(realizarSorteio, 10000);
 
 // Evento de conexão
 io.on('connection', (socket) => {
- console.log(`Um cliente conectado! ${socket.id}`);
+  console.log(`Um cliente conectado! ${socket.id}`);
 
- // Inicializa a lista de apostas para o novo cliente no Map
- apostasClientes.set(socket.id, []);
+  // Inicializa a lista de apostas para o novo cliente no Map
+  apostasClientes.set(socket.id, []);
 
- // Envia a mensagem de boas-vindas ao cliente
- const timestamp = new Date().toLocaleTimeString();
- socket.emit('msg1', `${timestamp}: CONECTADO!!`);
+  // Envia a mensagem de boas-vindas ao cliente
+  const timestamp = new Date().toLocaleTimeString();
+  socket.emit('msg1', `${timestamp}: CONECTADO!!`);
 
- // Thread 1 do servidor: Aguardando mensagens do cliente
- socket.on('client_message', (message) => {
-  console.log(`Mensagem recebida do cliente ${socket.id}: ${message}`);
- 
-  if (message.startsWith(':')) {       // Lógica para interpretar comandos ou apostas
-   const parts = message.split(' ');
-   const command = parts[0];
-   const value = parseInt(parts[1]);
-   switch (command) {
-    case ':inicio':
-     if (!isNaN(value)) {
-      configLoteria.inicio = value;
-      console.log(`Configuração atualizada: início = ${configLoteria.inicio}`);
-     }
-     break;
-    case ':fim':
-     if (!isNaN(value)) {
-     configLoteria.fim = value;
-      console.log(`Configuração atualizada: fim = ${configLoteria.fim}`);
-          }
-          break;
+  // Thread 1 do servidor: Aguardando mensagens do cliente
+  socket.on('client_message', (message) => {
+    console.log(`Mensagem recebida do cliente ${socket.id}: ${message}`);
+  
+    if (message.startsWith(':')) { // Lógica para interpretar comandos ou apostas
+      const parts = message.split(' ');
+      const command = parts[0];
+      const value = parseInt(parts[1]);
+
+      switch (command) {
+        case ':inicio':
+        case ':fim':
         case ':qtd':
-          if (!isNaN(value)) {
-            configLoteria.qtd = value;
-            console.log(`Configuração atualizada: quantidade = ${configLoteria.qtd}`);
+          if (isNaN(value)) {
+            socket.emit('lottery_error', 'O valor do comando deve ser um número válido.');
+          } else {
+            if (command === ':inicio') configLoteria.inicio = value;
+            if (command === ':fim') configLoteria.fim = value;
+            if (command === ':qtd') configLoteria.qtd = value;
+            socket.emit('lottery_message', `Comando "${command}" executado com sucesso.`);
+            console.log(`Configuração atualizada: ${command} = ${value}`);
           }
           break;
         default:
+          socket.emit('lottery_error', `Comando inválido "${command}".`);
           console.log('Comando inválido:', command);
+          break;
       }
     } else {
-      const numeros = message.split(' ').map(num => parseInt(num)).filter(num => !isNaN(num));
-      const apostasAtuais = apostasClientes.get(socket.id) || [];
-      apostasClientes.set(socket.id, apostasAtuais.concat(numeros));
-      console.log(`Apostas de ${socket.id} atualizadas:`, apostasClientes.get(socket.id));
+      // Lógica para apostas
+      const numbers = message.split(' ').map(num => parseInt(num));
+      const isInvalid = numbers.some(isNaN) || numbers.length === 0;
+
+      if (isInvalid) {
+        socket.emit('lottery_error', 'As apostas devem ser números separados por espaços.');
+      } else if (numbers.length !== configLoteria.qtd) {
+        socket.emit('lottery_error', `Aposta inválida. Por favor, digite exatamente ${configLoteria.qtd} números.`);
+      } else {
+        const outOfRange = numbers.some(num => num < configLoteria.inicio || num > configLoteria.fim);
+        if (outOfRange) {
+          socket.emit('lottery_error', `Aposta inválida. Todos os números devem estar entre ${configLoteria.inicio} e ${configLoteria.fim}.`);
+        } else {
+          // Aposta válida!
+          const apostasAtuais = apostasClientes.get(socket.id) || [];
+          apostasClientes.set(socket.id, apostasAtuais.concat(numbers));
+          socket.emit('lottery_message', `Apostas [${numbers.join(', ')}] salvas com sucesso.`);
+          console.log(`Apostas de ${socket.id} atualizadas:`, apostasClientes.get(socket.id));
+        }
+      }
     }
   });
 
