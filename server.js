@@ -67,7 +67,7 @@ function realizarSorteio() {
 }
 
 // Inicia o timer do sorteio
-setInterval(realizarSorteio, 10000);
+setInterval(realizarSorteio, 60000);
 
 // Evento de conexão
 io.on('connection', (socket) => {
