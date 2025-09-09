@@ -46,14 +46,16 @@ function realizarSorteio() {
       const acertos = apostas.filter(aposta => numerosSorteados.has(aposta)); 
       mensagemParaCliente = {
         sorted: resultado,
-        guesses: acertos
+        guesses: acertos,
+        apostou: true
       };
       console.log(`Resultado enviado para ${socketId}: ${acertos.length} acertos.`);
     } else {
       // Cliente não apostou, envia apenas o resultado do sorteio com lista de acertos vazia
       mensagemParaCliente = {
         sorted: resultado,
-        guesses: []
+        guesses: [],
+        apostou: false
       };
       console.log(`Resultado do sorteio enviado para ${socketId}. O cliente não fez apostas.`);
     }
@@ -67,7 +69,7 @@ function realizarSorteio() {
 }
 
 // Inicia o timer do sorteio
-setInterval(realizarSorteio, 60000);
+setInterval(realizarSorteio, 10000);
 
 // Evento de conexão
 io.on('connection', (socket) => {

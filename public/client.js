@@ -26,12 +26,16 @@ socket.on('resultado_loteria', (mensagemResultado) => {
     const numerosSorteados = mensagemResultado.sorted;
     const acertosCorretos = mensagemResultado.guesses;
 
-    if (acertosCorretos.length === 0 && mensagemResultado.sorted.length > 0) {
-        // Se a lista de acertos for vazia, mostra "Você não apostou"
+    if (mensagemResultado.apostou === false) {
+        // Se a propriedade 'apostou' for falsa, o cliente não fez apostas
         p.innerText = `Resultado do sorteio: [${numerosSorteados.join(', ')}]. Você não apostou.`;
     } else {
-        // Se houver acertos, mostra os números e os acertos
-        p.innerText = `Números sorteados: [${numerosSorteados.join(', ')}]. Você acertou: [${acertosCorretos.join(', ')}].`;
+        // Se a aposta foi feita, verifica se ele teve acertos
+        if (acertosCorretos.length === 0) {
+            p.innerText = `Números sorteados: [${numerosSorteados.join(', ')}]. Você não acertou nenhum número.`;
+        } else {
+            p.innerText = `Números sorteados: [${numerosSorteados.join(', ')}]. Você acertou: [${acertosCorretos.join(', ')}].`;
+        }
     }
     
     messagesDiv.appendChild(p);
