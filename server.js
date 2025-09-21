@@ -68,7 +68,7 @@ function realizarSorteio() {
   apostasClientes.clear();
 }
 
-// Inicia o timer do sorteio
+// Inicia o timer do sorteio em milissegundos 
 setInterval(realizarSorteio, 10000);
 
 // Evento de conexão

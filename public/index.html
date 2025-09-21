@@ -3,58 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Renato Cheira Pó</title>
+    <title>Projeto de Redes</title>
+    <link rel="stylesheet" href="estilo.css">
 </head>
 <body>
-    <div>
-        <header>
-            <div>
-                <h1>LottoTiger</h1>
-                <p id="status"></p>
+    <header>
+        <div class="header-content">
+            <h1>LottoTiger</h1>
+            <p id="status">Conectando...</p>
+        </div>
+    </header>
+    <main>
+        <h1 class="main-title">Loteria</h1>
+
+        <div class="input-section">
+            <div class="input-group">
+                <input type="text" id="inputMessage" placeholder="Digite seus comandos ou apostas...">
+                <button class="send-button" onclick="enviarMensagem()">Enviar</button>
             </div>
-        </header>
+        </div>
 
-        <main>
-
-            <section>
-<!--
-            <h2>Parâmetros da Aposta</h2>
-                <div>
-                    <label for="begin">Número inicial</label>
-                    <input type="number" id="begin_num">
+        <div class="instructions">
+            <h3 class="instructions-title">Instruções disponíveis</h3>
+            <div class="instruction-list">
+                <div class="instruction-item">
+                    <span class="command">:qtd</span>
+                    <span class="arrow">→</span>
+                    <span class="description">Altera a quantidade de números sorteados</span>
                 </div>
-                <div>
-                    <label for="end">Número final</label>
-                    <input type="number" id="end_num">
+                <div class="instruction-item">
+                    <span class="command">:inicio</span>
+                    <span class="arrow">→</span>
+                    <span class="description">Altera o valor inicial do intervalo de números sortidos</span>
                 </div>
-                <div>
-                    <label for="qtd">Quantidade de números: </label>
-                    <input type="number" id="qtd_num">
+                <div class="instruction-item">
+                    <span class="command">:fim</span>
+                    <span class="arrow">→</span>
+                    <span class="description">Altera o valor final do intervalo de números sortidos</span>
                 </div>
-            </section>                
--->                
+            </div>
+        </div>
 
-<!--           <section>
-                <h2>Números da Aposta</h2>
-                <div>
-                    <label for="y_nums">Digite seus números da sorte!</label>
-                    <input type="text" id="y_nums" placeholder="Ex: 5 14 23 41 59 61">
-                </div>
-                <button onclick="enviarAposta()">Enviar</button>
-                <div id="result-nums"></div>
-            </section>
-        </main>
-    </div>
--->
-</body>
-    <h1>Loteria</h1>
+        <div id="messages">
+            <h3 class="messages-title">Mensagens e Resultados</h3>
+            <p id="status"></p>
+        </div>
 
-    <input type="text" id="inputMessage" placeholder="Digite seus comandos ou apostas...">
-    <button onclick="enviarMensagem()">Enviar</button>
-
-    <p id="status"></p>
-    <div id="messages"></div>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="client.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="client.js"></script>
+        
+    </main>
 </body>
 </html>
