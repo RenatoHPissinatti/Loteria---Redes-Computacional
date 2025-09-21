@@ -2,6 +2,8 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const path = require('path');
+const { nextTick } = require('process');
+const { type } = require('os');
 
 const app = express();
 const server = http.createServer(app);
@@ -9,6 +11,9 @@ const io = new Server(server);
 
 // Define a porta do servidor
 const PORT = process.env.PORT || 3000;
+
+// Define a quantidade máxima de clientes
+const MAX_CLIENTS = 1;
 
 // Serve os arquivos estáticos da pasta 'public'
 app.use(express.static(path.join(__dirname, 'public')));
@@ -21,6 +26,10 @@ app.get('/', (req, res) => {
 // Variáveis de estado globais
 const apostasClientes = new Map();
 const configLoteria = { inicio: 0, fim: 100, qtd: 5 };
+
+function quantidadeClientes () {
+  return io.sockets.sockets.size;
+}
 
 // Função para realizar o sorteio (Thread 2 do Servidor)
 function realizarSorteio() {
@@ -70,6 +79,25 @@ function realizarSorteio() {
 
 // Inicia o timer do sorteio em milissegundos 
 setInterval(realizarSorteio, 10000);
+
+io.use((socket, next) => {
+  const clientesConectados = quantidadeClientes();
+
+  if (clientesConectados >= MAX_CLIENTS) {
+    console.log(`Conexão rejeitada para ${socket.id}: Limite de ${MAX_CLIENTS} clientes atingido`);
+    const error = new Error('Servidor lotado. Limite máximo de clientes atingido');
+    
+    error.data = {
+      type: 'SERVER_FULL',
+      maxCLients: MAX_CLIENTS,
+      clientesConectados: clientesConectados
+    };
+    return next(error);
+  }
+
+  console.log(`Conexão permitida: ${clientesConectados + 1} cliente(s) conectado(s)`);
+  next();
+})
 
 // Evento de conexão
 io.on('connection', (socket) => {
