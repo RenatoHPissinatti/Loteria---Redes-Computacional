@@ -136,7 +136,7 @@ io.on('connection', (socket) => {
           break;
         case ':sair':
           console.log(`Cliente ${socket.id} solicitou desconexão`);
-          socket.emit('Desconexão confirmada', 'Desconectando... até logo!');
+          socket.emit('saida_confirmada', 'Desconectando... até logo!');
 
           setTimeout(() => {
             socket.disconnect(true); // Força disconexão

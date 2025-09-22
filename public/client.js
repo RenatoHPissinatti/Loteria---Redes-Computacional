@@ -68,12 +68,21 @@ socket.on('lottery_message', (confirmMessage) => {
 
 socket.on('saida_confirmada',(message) => {
     const messagesDiv = document.getElementById('messages');
+    const status = document.getElementById('status');
+
+    status.innerText = 'DESCONETADO';
+
     const p = document.createElement('p');
+
     p.innerText = `${message}`;
     p.style.color = '#ff6b35';
     p.style.fontWeight = 'bold';
     messagesDiv.appendChild(p);
     console.log('Desconexão confirmada pelo servidor. Encerrando cliente...');
+
+    setTimeout(() => {
+        window.close() || (window.location.href = 'about:blank');
+    }, 5000);
 });
 
 socket.on('disconnect', (reason) => {
