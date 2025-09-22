@@ -140,11 +140,14 @@ io.on('connection', (socket) => {
       }
     } else {
       // Lógica para apostas
-      const numbers = message.split(' ').map(num => parseInt(num));
-      const isInvalid = numbers.some(isNaN) || numbers.length === 0;
+      const numbers = message.split(' ').map(num => parseInt(num)).filter(num => !isNaN(num));
+      const uniqueNumbers = new Set(numbers);
+      const isInvalid = numbers.length === 0 || numbers.some(isNaN);
 
       if (isInvalid) {
         socket.emit('lottery_error', 'As apostas devem ser números separados por espaços.');
+      } else if (numbers.length !== uniqueNumbers.size) {
+        socket.emit('lottery_error', 'Aposta inválida. Não é permitido números repetidos.');
       } else if (numbers.length !== configLoteria.qtd) {
         socket.emit('lottery_error', `Aposta inválida. Por favor, digite exatamente ${configLoteria.qtd} números.`);
       } else {
