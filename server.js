@@ -35,6 +35,7 @@ function quantidadeClientes () {
 function realizarSorteio() {
   console.log('--- REALIZANDO SORTEIO ---');
   console.log('Configuração atual:', configLoteria);
+  console.log(`Clientes conectados: ${quantidadeClientes()}`);
 
   const { inicio, fim, qtd } = configLoteria;
   const numerosSorteados = new Set();
@@ -133,6 +134,15 @@ io.on('connection', (socket) => {
             console.log(`Configuração atualizada: ${command} = ${value}`);
           }
           break;
+        case ':sair':
+          console.log(`Cliente ${socket.id} solicitou desconexão`);
+          socket.emit('Desconexão confirmada', 'Desconectando... até logo!');
+
+          setTimeout(() => {
+            socket.disconnect(true); // Força disconexão
+            console.log(`Cliente ${socket.id} desconectado`)
+          }, 500);
+          break;
         default:
           socket.emit('lottery_error', `Comando inválido "${command}".`);
           console.log('Comando inválido:', command);
@@ -172,4 +182,5 @@ io.on('connection', (socket) => {
 // Inicia o servidor
 server.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
+  console.log(`Limite máximo de clientes: ${MAX_CLIENTS}`);
 });
