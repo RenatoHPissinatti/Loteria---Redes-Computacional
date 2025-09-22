@@ -78,7 +78,7 @@ function realizarSorteio() {
 }
 
 // Inicia o timer do sorteio em milissegundos 
-setInterval(realizarSorteio, 10000);
+setInterval(realizarSorteio, 60000);
 
 io.use((socket, next) => {
   const clientesConectados = quantidadeClientes();
